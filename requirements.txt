@@ -1,1 +1,3 @@
-fastapi\nuvicorn\nsqlalchemy\n
+fastapi
+nuvicorn
+nsqlalchemy
