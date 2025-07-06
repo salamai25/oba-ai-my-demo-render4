@@ -1,117 +1,34 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>OBA Demo Full</title>
-  <style>
-    body { font-family: sans-serif; padding: 2rem; background: #f7f7f7; }
-    .section { background: white; padding: 1rem; margin-bottom: 2rem; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    input, button { display: block; margin: 8px 0; padding: 6px; width: 100%; }
-    table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-    button { background-color: #007bff; color: white; border: none; cursor: pointer; }
-  </style>
+  <title>OBA - عربي / English</title>
+  <script>
+    let lang = "en";
+    function toggleLang() {
+      lang = lang === "en" ? "ar" : "en";
+      document.querySelectorAll("[data-en]").forEach(el => {
+        el.textContent = lang === "en" ? el.dataset.en : el.dataset.ar;
+      });
+    }
+
+    async function fetchStats() {
+      const res = await fetch("/api/stats");
+      const data = await res.json();
+      document.getElementById("report").innerHTML = `
+        <p data-en="Programs:" data-ar="البرامج:">Programs:</p> ${data.programs}<br>
+        <p data-en="Courses:" data-ar="الدورات:">Courses:</p> ${data.courses}<br>
+        <p data-en="Assessments:" data-ar="التقييمات:">Assessments:</p> ${data.assessments}
+      `;
+      toggleLang();
+    }
+  </script>
 </head>
-<body>
-
-  <div class="section">
-    <h2>📘 Add Program</h2>
-    <input id="programName" placeholder="Program name" />
-    <input id="programDesc" placeholder="Description" />
-    <button onclick="addProgram()">Add Program</button>
-    <button onclick="fetchPrograms()">Show Programs</button>
-    <table id="programTable"><thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead><tbody></tbody></table>
-  </div>
-
-  <div class="section">
-    <h2>📚 Add Course</h2>
-    <input id="courseName" placeholder="Course name" />
-    <input id="courseCode" placeholder="Code" />
-    <input id="courseProgramId" placeholder="Program ID" type="number" />
-    <button onclick="addCourse()">Add Course</button>
-    <button onclick="fetchCourses()">Show Courses</button>
-    <table id="courseTable"><thead><tr><th>ID</th><th>Name</th><th>Code</th><th>Program</th></tr></thead><tbody></tbody></table>
-  </div>
-
-  <div class="section">
-    <h2>📝 Add Assessment</h2>
-    <input id="assessTitle" placeholder="Title" />
-    <input id="assessType" placeholder="Type" />
-    <input id="assessMarks" placeholder="Total Marks" type="number" />
-    <input id="assessWeight" placeholder="Weightage" type="number" />
-    <input id="assessSession" placeholder="Session" />
-    <input id="assessDate" placeholder="Date" type="date" />
-    <input id="assessCourseId" placeholder="Course ID" type="number" />
-    <button onclick="addAssessment()">Add Assessment</button>
-    <button onclick="fetchAssessments()">Show Assessments</button>
-    <table id="assessmentTable"><thead><tr><th>ID</th><th>Title</th><th>Type</th><th>Course ID</th></tr></thead><tbody></tbody></table>
-  </div>
-
-<script>
-const api = window.location.origin + "/api";
-
-async function addProgram() {
-  const name = document.getElementById('programName').value;
-  const description = document.getElementById('programDesc').value;
-  await fetch(api + "/programs", {
-    method: "POST", headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, description })
-  });
-  alert("✅ Program added");
-}
-
-async function fetchPrograms() {
-  const res = await fetch(api + "/programs");
-  const data = await res.json();
-  const tbody = document.querySelector("#programTable tbody");
-  tbody.innerHTML = "";
-  data.forEach(p => tbody.innerHTML += `<tr><td>${p.id}</td><td>${p.name}</td><td>${p.description}</td></tr>`);
-}
-
-async function addCourse() {
-  const name = document.getElementById('courseName').value;
-  const code = document.getElementById('courseCode').value;
-  const program_id = parseInt(document.getElementById('courseProgramId').value);
-  await fetch(api + "/courses", {
-    method: "POST", headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, code, program_id })
-  });
-  alert("✅ Course added");
-}
-
-async function fetchCourses() {
-  const res = await fetch(api + "/courses");
-  const data = await res.json();
-  const tbody = document.querySelector("#courseTable tbody");
-  tbody.innerHTML = "";
-  data.forEach(c => tbody.innerHTML += `<tr><td>${c.id}</td><td>${c.name}</td><td>${c.code}</td><td>${c.program_id}</td></tr>`);
-}
-
-async function addAssessment() {
-  const body = {
-    title: document.getElementById('assessTitle').value,
-    type: document.getElementById('assessType').value,
-    total_marks: parseInt(document.getElementById('assessMarks').value),
-    weightage: parseInt(document.getElementById('assessWeight').value),
-    session: document.getElementById('assessSession').value,
-    date: document.getElementById('assessDate').value,
-    course_id: parseInt(document.getElementById('assessCourseId').value)
-  };
-  await fetch(api + "/assessments", {
-    method: "POST", headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  alert("✅ Assessment added");
-}
-
-async function fetchAssessments() {
-  const res = await fetch(api + "/assessments");
-  const data = await res.json();
-  const tbody = document.querySelector("#assessmentTable tbody");
-  tbody.innerHTML = "";
-  data.forEach(a => tbody.innerHTML += `<tr><td>${a.id}</td><td>${a.title}</td><td>${a.type}</td><td>${a.course_id}</td></tr>`);
-}
-</script>
-
+<body style="font-family: sans-serif; padding: 2rem">
+  <h1 data-en="Outcome-Based Assessment" data-ar="التقييم القائم على المخرجات">Outcome-Based Assessment</h1>
+  <button onclick="toggleLang()">🌐 Toggle Language</button>
+  <button onclick="fetchStats()" data-en="View Report" data-ar="عرض التقرير">View Report</button>
+  <div id="report" style="margin-top:1rem;"></div>
 </body>
 </html>
